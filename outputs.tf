@@ -1,7 +1,7 @@
-#output "instance_ami" {
-#  value = aws_instance.web.ami
-#}
+output "ec2_instance_id" {
+  value = aws_instance.example.id
+}
 
-#output "instance_arn" {
-#  value = aws_instance.web.arn
-#}
+output "ec2_public_ip" {
+  value = aws_instance.example.public_ip
+}
