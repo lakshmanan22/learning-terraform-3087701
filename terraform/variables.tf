@@ -11,5 +11,5 @@ variable "instance_type" {
 
 variable "ami_id" {
   description = "Amazon Machine Image ID"
-  default     = "ami-0a1235697f4afa8a4"  # Amazon Linux 2 in mumbai
+  default     = "ami-0a1235697f4afa8a4" # Amazon Linux 2 in mumbai
 }
