@@ -3,7 +3,7 @@ terraform {
     organization = "Demo-3i"
 
     workspaces {
-      name = "terraform"
+      name = "learning-terraform-3087701"
     }
   }
 
