@@ -1,3 +1,4 @@
+#create ec2
 name: Terraform Deploy to AWS
 
 on:
