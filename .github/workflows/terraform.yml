@@ -1,4 +1,4 @@
-#create ec2 using terraform cloud
+#create ec2 using terraform cloud using auto-trigger
 name: Terraform Deploy to AWS
 
 on:
