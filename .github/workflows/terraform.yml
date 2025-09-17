@@ -2,9 +2,7 @@
 name: Terraform Deploy to AWS
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   terraform:
