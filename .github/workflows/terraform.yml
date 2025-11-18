@@ -1,8 +1,8 @@
 #create ec2 using terraform cloud using auto-trigger
 name: Terraform Deploy to AWS
 
-on:
-  workflow_dispatch:
+# on:
+#   workflow_dispatch:
 
 jobs:
   terraform:
