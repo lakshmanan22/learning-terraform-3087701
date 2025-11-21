@@ -1,96 +1,81 @@
-locals {
-  environment_config = {
-    "dev"     = var.dev_config
-    "test"    = var.test_config
-    "prod"    = var.prod_config
-    "dr-prod" = var.dr_prod_config
+dev_config = {
+  drpolymer = {
+    #application_support_group_name              = "Research & Technology"
+    application_support_group_abbreviation = "RT"
+    location                               = "southcentralus"
+    cost_center                            = "P3603"
+    department                             = "Business Transformation"
+    description                            = "Business Transformation Development Research and Technology Resources"
+    managed_by                             = "DT"
+    application_developer_ad_group_id      = "54de110d-6f7f-4e41-83ed-ffa4db4c231d" // AZ-HQ-AppDev-RT-Admins
+    application_developer_pim_group_id     = "c5b3a953-4d20-4996-b559-bbd12679acf4" // PIM group used for resource level permissions
+    cdn_sa_deployment_service_principal_id = "275ce371-9040-419e-85e5-0c28ab23f957"
+    tf_cloud_agent_role_assignments        = {}
+    database_configuration = {
+      auto_pause_delay_in_minutes = -1
+      min_capacity                = 0
+      database_name               = "sqldbCPCscusAM-App-RT-Drpolymer-Dev"
+      create_mode                 = "Default"
+      elastic_pool_enabled        = false
+      max_size_gb                 = 2 #10
+      sku_name                    = "Basic"
+      storage_account_type        = "Local"
+      diagnostics                 = false
+    }
+    keyvault_configuration = {
+      /*       key_vault_sku_name                       = "standard"
+      kv_application_abbreviation              = "DRPoly"
+      kv_pe_ip                                 = "10.17.0.11"
+      diagnostics                              = false
+      keyvault_deployment_service_principal_id = "c0401762-ee1f-4dc0-9370-0b2ec00a2b82" */
+    }
+    webapp_configuration = {
+      web_app_pe_ip    = null
+      diagnostics      = false
+      service_plan_key = "appservices"
+      #webapp_deployment_service_principal_id = "c0401762-ee1f-4dc0-9370-0b2ec00a2b82"
+      app_role_assignments = {
+        "Website-Contributor-GitHub-Actions-cpchem-nebula-backend" = {
+          role_definition_name = "Website Contributor"
+          principal_id         = "c0401762-ee1f-4dc0-9370-0b2ec00a2b82"
+        },
+        "Website-Contributor-PIM" = {
+          role_definition_name = "Website Contributor"
+          principal_id         = "c5b3a953-4d20-4996-b559-bbd12679acf4"
+        },
+      }
+    }
+    functionapp_configuration = {
+      function_app_pe_ip = null
+      diagnostics        = false
+      service_plan_key   = "appservices"
+      #functionapp_deployment_service_principal_id = "3e5283ac-04ee-4a40-8f65-2d1bb37115f9"
+      function_app_role_assignments = {
+        "Website-Contributor-PIM" = {
+          role_definition_name = "Website Contributor"
+          principal_id         = "c5b3a953-4d20-4996-b559-bbd12679acf4"
+        },
+        "Website-Contributor-GitHub-Actions-cpchem-nebula-functions" = {
+          role_definition_name = "Website Contributor"
+          principal_id         = "3e5283ac-04ee-4a40-8f65-2d1bb37115f9"
+        },
+      }
+    }
+    cdn_configuration = {
+      origin_path                                  = "/drpolymer"
+      cdn_custom_domain                            = null
+      storage_container_name                       = "drpolymer"
+      application_two_letter_abbrevation           = "dp"
+      cdn_endpoint_deployment_service_principal_id = "c0401762-ee1f-4dc0-9370-0b2ec00a2b82"
+    }
+    application_storage_configuration = {
+      storage_container_name                                   = null
+      application_sa_container_deployment_service_principal_id = "c0401762-ee1f-4dc0-9370-0b2ec00a2b82"
+    }
+    application_abbrevation = "DRPoly"
+
+    adf_configuration = {}
+
+    logicapp_configuration = {}
   }
-  configuration = local.environment_config[var.environment][var.application]
 }
-
-module "app" {
-  source  = "app.terraform.io/cpchem/asg-application/azurerm"
-  version = "0.8.8"
-
-  count = contains(["dev", "test", "prod"], var.environment) ? 1 : 0
-
-  environment                            = var.environment
-  application                            = var.application
-  application_support_group_abbreviation = local.configuration.application_support_group_abbreviation
-  location                               = local.configuration.location
-  cost_center                            = local.configuration.cost_center
-  department                             = local.configuration.department
-  description                            = local.configuration.description
-  managed_by                             = local.configuration.managed_by
-  application_developer_ad_group_id      = local.configuration.application_developer_ad_group_id
-  application_developer_pim_group_id     = local.configuration.application_developer_pim_group_id
-  #application_support_group_name              = local.configuration.application_support_group_name
-  sql_server_id                          = try(data.tfe_outputs.shared.nonsensitive_values.sql_server_id, null)
-  elastic_pool_id                        = try(data.tfe_outputs.shared.nonsensitive_values.elastic_pool_id, null)
-  database_configuration                 = local.configuration.database_configuration
-  tenant_id                              = data.azurerm_subscription.current.tenant_id
-  application_abbrevation                = local.configuration.application_abbrevation
-  resource_group_name                    = data.tfe_outputs.shared.nonsensitive_values.resource_group_name
-  asp_id                                 = try(data.tfe_outputs.shared.nonsensitive_values.asp_id, "")
-  cdn_sa_deployment_service_principal_id = local.configuration.cdn_sa_deployment_service_principal_id
-  vnet_subnet_id                         = try(data.tfe_outputs.shared.nonsensitive_values.subnet_id, null)
-  storage_account_name                   = try(data.tfe_outputs.shared.nonsensitive_values.storage_account_name, "")
-  primary_access_key                     = try(data.tfe_outputs.shared.values.storage_account_access_key, null)
-  keyvault_configuration                 = local.configuration.keyvault_configuration
-  webapp_configuration                   = local.configuration.webapp_configuration
-  functionapp_configuration              = local.configuration.functionapp_configuration
-  cdn_configuration                      = local.configuration.cdn_configuration
-  application_storage_configuration      = local.configuration.application_storage_configuration
-  adf_configuration                      = local.configuration.adf_configuration
-  logicapp_configuration                 = local.configuration.logicapp_configuration
-  tf_cloud_agent_role_assignments        = try(local.configuration.tf_cloud_agent_role_assignments, null)
-
-  providers = {
-    azurerm             = azurerm
-    azurerm.server-team = azurerm.server-team
-  }
-}
-
-module "app-dr" {
-  source  = "app.terraform.io/cpchem/asg-application-dr/azurerm"
-  version = "0.3.0"
-
-  count = var.environment == "dr-prod" ? 1 : 0
-
-  environment                                  = var.environment
-  application                                  = var.application
-  application_support_group_abbreviation       = local.configuration.application_support_group_abbreviation
-  location                                     = local.configuration.location
-  cost_center                                  = local.configuration.cost_center
-  department                                   = local.configuration.department
-  description                                  = local.configuration.description
-  managed_by                                   = local.configuration.managed_by
-  application_developer_ad_group_id            = local.configuration.application_developer_ad_group_id
-  application_developer_pim_group_id           = local.configuration.application_developer_pim_group_id
-  cdn_endpoint_id                              = try(data.tfe_outputs.prod_application[0].nonsensitive_values.cdn_endpoint_id, null)
-  cdn_storage_container_id                     = try(data.tfe_outputs.prod_application[0].nonsensitive_values.cdn_storage_container_id, null)
-  cdn_sa_deployment_service_principal_id       = local.configuration.cdn_sa_deployment_service_principal_id
-  cdn_endpoint_deployment_service_principal_id = local.configuration.cdn_endpoint_deployment_service_principal_id
-  sql_server_id                                = try(data.tfe_outputs.shared.nonsensitive_values.sql_server_id, null)
-  elastic_pool_id                              = try(data.tfe_outputs.shared.nonsensitive_values.elastic_pool_id, null)
-  sql_replica_source                           = data.tfe_outputs.prod_application[0].nonsensitive_values.application_database_idset
-  tenant_id                                    = data.azurerm_subscription.current.tenant_id
-  application_abbrevation                      = local.configuration.application_abbrevation
-  resource_group_name                          = try(data.tfe_outputs.shared.nonsensitive_values.resource_group_name, null)
-  asp_id                                       = try(data.tfe_outputs.shared.nonsensitive_values.asp_id, "")
-  vnet_subnet_id                               = try(data.tfe_outputs.shared.nonsensitive_values.subnet_id, "")
-  storage_account_name                         = try(data.tfe_outputs.shared.nonsensitive_values.storage_account_name, "")
-  //origin_path                            = local.configuration.origin_path
-  //storage_container_name                 = local.configuration.storage_container_name
-  database_configuration    = local.configuration.database_configuration
-  keyvault_configuration    = local.configuration.keyvault_configuration
-  webapp_configuration      = local.configuration.webapp_configuration
-  functionapp_configuration = local.configuration.functionapp_configuration
-
-  providers = {
-    azurerm             = azurerm
-    azurerm.server-team = azurerm.server-team
-  }
-
-}
-
