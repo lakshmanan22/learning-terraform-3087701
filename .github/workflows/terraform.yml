@@ -1,49 +1,49 @@
-#create ec2 using terraform cloud using auto-trigger
-name: Terraform Deploy to AWS
+# #create ec2 using terraform cloud using auto-trigger
+# name: Terraform Deploy to AWS
 
-# on:
-#   workflow_dispatch:
+# # on:
+# #   workflow_dispatch:
 
-jobs:
-  terraform:
-    name: Apply Terraform
-    runs-on: ubuntu-latest
+# jobs:
+#   terraform:
+#     name: Apply Terraform
+#     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: terraform
+#     defaults:
+#       run:
+#         working-directory: terraform
 
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Checkout repo
+#       uses: actions/checkout@v3
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.5.0
+#     - name: Setup Terraform
+#       uses: hashicorp/setup-terraform@v3
+#       with:
+#         terraform_version: 1.5.0
 
-    - name: Terraform Init
-      run: terraform init
-      env:
-        TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+#     - name: Terraform Init
+#       run: terraform init
+#       env:
+#         TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
-    - name: Terraform Format Check
-      run: terraform fmt -check
+#     - name: Terraform Format Check
+#       run: terraform fmt -check
 
-    - name: Terraform Validate
-      run: terraform validate
+#     - name: Terraform Validate
+#       run: terraform validate
 
-    - name: Terraform Plan
-      run: terraform plan
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+#     - name: Terraform Plan
+#       run: terraform plan
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
-    # - name: Terraform Apply
-    #   run: terraform apply -auto-approve
-    #   env:
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }} 
+#     # - name: Terraform Apply
+#     #   run: terraform apply -auto-approve
+#     #   env:
+#     #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#     #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     #     TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }} 
 
